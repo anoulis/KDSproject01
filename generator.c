@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 void saveFile(char* filename, float* cords[3],int n)
 {
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     if (argc<1 || argc>3)
     {
       printf("Error");
-      return;
+      return 0;
     }
     char* filename=argv[1];
     int coordinate_index=atoi(argv[2]);

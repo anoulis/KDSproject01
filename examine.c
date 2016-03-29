@@ -37,7 +37,7 @@ void read_file(char* filename)
   printf("Percentage of coordinates inside interval: %f%c\n", percentage, 37);
 }
 
-print_time()
+void print_time()
 {
   const int DAS_NANO_SECONDS_IN_SEC = 1000000000;
   long timeElapsed_s = end.tv_sec -start.tv_sec;
@@ -56,4 +56,3 @@ int main()
   print_time();
   return 0;
 }
-
