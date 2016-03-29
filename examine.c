@@ -15,7 +15,8 @@ void read_file(char* filename)
     return;
   }
 
-  int count1=count2 = 0;
+  int count1 = 0;
+  int count2 = 0;
   float x;
   float percentage;
   clock_gettime(CLOCK_MONOTONIC, &start);
@@ -33,7 +34,7 @@ void read_file(char* filename)
   printf("Total coordinates read: %d\n", count1);
   printf("Total coordinates inside interval: %d\n", count2);
   percentage = (float)count2/(float)count1*100;
-  printf("Percentage of coordinates inside interval: %f %c\n", percentage, 37);
+  printf("Percentage of coordinates inside interval: %f%c\n", percentage, 37);
 }
 
 print_time()
