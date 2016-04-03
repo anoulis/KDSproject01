@@ -3,25 +3,30 @@
 #include <time.h>
 #include <omp.h>
 
+#define limit1 12
+#define limit2 30
+#define number 15000000
+
+
+
 struct timespec start,end;
 
 void read_file(char* filename)
 {
   FILE *fp;
   fp = fopen(filename, "r");
-
   if (fp == NULL)
   {
     puts("Error reading file");
     return;
   }
 
-   float *Array,x,percentage;
-   Array=(float*)calloc(15000000*3,sizeof(float));
-   long size =(15000000*30),size2;
+   float *Array,percentage;
+   Array=(float*)calloc(number*3,sizeof(float));
+   long size =(number*30);
    char *buffer,c[9];
    buffer=(char*)calloc(size,sizeof(char));
-   int flag=0,k=0,i=0,count1=0,count2=0;
+   int k=0,i=0,count1=0,count2=0;
 
  clock_gettime(CLOCK_MONOTONIC, &start);
   fread(buffer, size, 1, fp);
@@ -33,16 +38,15 @@ void read_file(char* filename)
       }
       else
       {
-        Array[flag]=atof(c);
-        flag++;
+        Array[count1]=atof(c);
+        count1++;
         k=0;
       }
     }
-  count1=flag;
  #pragma omp parallel for firstprivate(count1) reduction(+:count2)
   for (i=0;i<count1;i++)
   {
-   if (Array[i]>=12 && Array[i]<=30)
+   if (Array[i]>=limit1 && Array[i]<=limit2)
     count2++;
   }
 
