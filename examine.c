@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define limit1 12
+#define limit2 30
 
 struct timespec start,end;
 
@@ -25,7 +27,7 @@ void read_file(char* filename)
   {
    fscanf(fp,"%f ",&x);
     count1++;
-    if (x>=12 && x<=30)
+    if (x>=limit1 && x<=limit2)
       count2++;
 
   }
