@@ -17,21 +17,39 @@ void read_file(char* filename)
     return;
   }
 
-  int count1 = 0;
-  int count2 = 0;
-  float x;
-  float percentage;
-  clock_gettime(CLOCK_MONOTONIC, &start);
+  float *Array,percentage;
+  Array=(float*)calloc(15000000*3,sizeof(float));
+  long size =(15000000*30);
+  char *buffer,c[9];
+  buffer=(char*)calloc(size,sizeof(char));
+  int flag=0,k=0,i=0,count1=0,count2=0;
 
-  while (!feof(fp))
-  {
-   fscanf(fp,"%f ",&x);
-    count1++;
-    if (x>=limit1 && x<=limit2)
-      count2++;
+clock_gettime(CLOCK_MONOTONIC, &start);
+ fread(buffer, size, 1, fp);
+   for(i=0;i<size;i++)
+   { if(buffer[i]!=' ' && buffer[i]!='\n')
+     {
+       c[k]=buffer[i];
+       k++;
+     }
+     else
+     {
+       Array[flag]=atof(c);
+       flag++;
+       k=0;
+     }
+   }
+ count1=flag;
+ for (i=0;i<count1;i++)
+ {
+  if (Array[i]>=limit1 && Array[i]<=limit2)
+   count2++;
+ }
 
-  }
-  clock_gettime(CLOCK_MONOTONIC, &end);
+ free(buffer);
+ free(Array);
+
+   clock_gettime(CLOCK_MONOTONIC, &end);
   fclose(fp);
   printf("Total coordinates read: %d\n", count1);
   printf("Total coordinates inside interval: %d\n", count2);

@@ -1,19 +1,28 @@
 CC= gcc
-CFLAGS= -g -Wall
+CFLAGS= -Wall -g
 
 all: generate examine examine_parallel
 
-generate: generate.c
-	$(CC) $(CFLAGS) generate.c -o generate
-	./generate data 15000000
+generate: generator.o
+	$(CC) generator.o -o generator
+	./generator data 15000000
 
-examine: examine.c
-	$(CC) $(CFLAGS) examine.c -o examine
-	./examine	
-	
-examine_parallel: examine_parallel.c
-	$(CC) $(CFLAGS) examine_parallel.c -o examine_parallel
+examine: examine.o
+	$(CC) examine.o -o examine
+	./examine
+
+examine_parallel: examine_parallel.o
+	$(CC) -fopenmp examine_parallel.o -o examine_parallel
 	./examine_parallel
 
-clean: 
-	rm-f generate examine examine_parallel *.o
+generator.o: generator.c
+	$(CC) $(CFLAGS) -c generator.c
+
+examine.o: examine.c
+	$(CC) $(CFLAGS) -c examine.c
+
+examine_parallel.o: examine_parallel.c
+	$(CC) -fopenmp $(CFLAGS) -c examine_parallel.c
+	
+clean:
+	rm -f generator examine examine_parallel *.o
