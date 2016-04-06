@@ -13,10 +13,24 @@
 struct timespec start,end;
 
 
+int devider(int size)
+{ int subtotal;
+     subtotal=number%size;
+     if(subtotal==0)
+     {
+       return 0;
+     }
+     else
+     {
+       return(number-subtotal);
+
+     }
+}
+
 
 int read_file(char* filename,int argc, char* argv[])
 {
-  int rank, size, bufsize, nints,sz,count2=0,i,k=0,count1=0;
+  int rank, size, bufsize,tempbufsize, nints,sz,count2=0,i,k=0,count1=0;
   float *Array,percentage,x;
   Array=(float*)calloc(number*3,sizeof(float));
   MPI_File myfile;
@@ -24,20 +38,43 @@ int read_file(char* filename,int argc, char* argv[])
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  bufsize=FILESIZE/size;
-  nints=bufsize/sizeof(char);
+    MPI_Offset start2;
+    MPI_Offset end2;
+  //int start,end;
+  if(devider(size)==0)
+  { bufsize=(number/size)*30;
+    if(rank==size-1)
+       {
+          start2 = rank * bufsize;
+          end2   = start2 + bufsize;
+       }
+       else
+       {
+         start2 = rank * bufsize;
+         end2   = start2 + bufsize - 1;
+       }
+  }
+  else
+  {
+     if(rank==size-1)
+       {   bufsize=(devider(size)/size)*30+(number%size)*30;
+          start2 = rank * (devider(size)/size)*30;
+          end2   = start2 + (devider(size)/size)*30+(number%size)*30 ;
+       }
+       else
+       {  bufsize=(devider(size)/size)*30;
+         start2 = rank * (devider(size)/size)*30;
+         end2  = start2 + (devider(size)/size)*30 - 1;
+       }
+  }
   char *buffer,c[9];
-  buffer=(char*)calloc(nints,sizeof(char));
+  buffer=(char*)calloc(bufsize,sizeof(char));
   MPI_File_open (MPI_COMM_WORLD, filename, MPI_MODE_RDONLY,MPI_INFO_NULL, &myfile);
   clock_gettime(CLOCK_MONOTONIC, &start);
-  MPI_File_read_at(myfile, rank*bufsize,buffer, nints, MPI_CHAR, &status);
+  //MPI_File_read_at(myfile, rank*bufsize,buffer, nints, MPI_CHAR, &status);
+  MPI_File_read_at_all(myfile, start2, buffer, bufsize, MPI_CHAR, &status);
 
-  for (i=0;i<nints;i++)
-  {
-    printf("%d->%c\n",i,buffer[i]);
-  }
-
-for(i=0;i<nints;i++)
+for(i=0;i<bufsize;i++)
     { if(buffer[i]!=' ' && buffer[i]!='\n')
       {
         c[k]=buffer[i];
@@ -56,6 +93,7 @@ for(i=0;i<nints;i++)
    if (Array[i]>=limit1 && Array[i]<=limit2)
     count2++;
   }
+
 
   clock_gettime(CLOCK_MONOTONIC, &end);
   MPI_File_close(&myfile);
