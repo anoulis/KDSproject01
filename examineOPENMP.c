@@ -11,56 +11,6 @@
 
 struct timespec start,end;
 
-void read_file(char* filename)
-{
-  FILE *fp;
-  fp = fopen(filename, "r");
-  if (fp == NULL)
-  {
-    puts("Error reading file");
-    return;
-  }
-
-   float *Array,percentage;
-   Array=(float*)calloc(number*3,sizeof(float));
-   long size =(number*30);
-   char *buffer,c[9];
-   buffer=(char*)calloc(size,sizeof(char));
-   int k=0,i=0,count1=0,count2=0;
-
- clock_gettime(CLOCK_MONOTONIC, &start);
-  fread(buffer, size, 1, fp);
-    for(i=0;i<size;i++)
-    { if(buffer[i]!=' ' && buffer[i]!='\n')
-      {
-        c[k]=buffer[i];
-        k++;
-      }
-      else
-      {
-        Array[count1]=atof(c);
-        count1++;
-        k=0;
-      }
-    }
- #pragma omp parallel for firstprivate(count1) reduction(+:count2)
-  for (i=0;i<count1;i++)
-  {
-   if (Array[i]>=limit1 && Array[i]<=limit2)
-    count2++;
-  }
-
-  free(buffer);
-  free(Array);
-
-  clock_gettime(CLOCK_MONOTONIC, &end);
-  fclose(fp);
-  printf("Total coordinates read: %d\n",count1);
-  printf("Total coordinates inside interval: %d\n",count2);
-  percentage = ((float)count2/(float)count1)*100;
-  printf("Percentage of coordinates inside interval: %f%c\n", percentage,37);
-}
-
 void print_time()
 {
   const int DAS_NANO_SECONDS_IN_SEC = 1000000000;
@@ -74,8 +24,56 @@ void print_time()
   printf("Time: %ld.%09ld secs \n",timeElapsed_s,timeElapsed_n);
 }
 
+void read_file(char* filename)
+{
+  FILE *fp;
+  fp = fopen(filename, "r");
+  if (fp == NULL)
+  {
+    puts("Error reading file");
+    return;
+  }
+
+   float percentage,x;
+   long size =(number*30);
+   char *buffer,c[9];
+   buffer=(char*)calloc(size,sizeof(char));
+   int k=0,i=0,count1=0,count2=0;
+  clock_gettime(CLOCK_MONOTONIC, &start);
+  fread(buffer, size, 1, fp);
+  #pragma omp nowait parallel for firstprivate(size) reduction(+:count1) reduction(+:count2)
+    for(i=0;i<size;i++)
+    { if(buffer[i]!=' ' && buffer[i]!='\n')
+      {
+        c[k]=buffer[i];
+        k++;
+      }
+      else
+      {
+        x=atof(c);
+        if (x>=limit1 && x<=limit2)
+        count2++;
+        count1++;
+        k=0;
+      }
+    }
+
+  free(buffer);
+  clock_gettime(CLOCK_MONOTONIC, &end);
+  fclose(fp);
+  printf("Total coordinates read: %d\n",count1);
+  printf("Total coordinates inside interval: %d\n",count2);
+  percentage = ((float)count2/(float)count1)*100;
+  printf("Percentage of coordinates inside interval: %f%c\n", percentage,37);
+  print_time();
+
+}
+
+
+
 int main()
 {
     read_file("data");
-    print_time();
+    return 0;
+
 }
