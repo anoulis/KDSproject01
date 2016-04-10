@@ -10,7 +10,7 @@ generate: generator.o
 
 examine: examine.o
 	$(CC) examine.o -o examine
-	./examine
+	./examine data
 
 examine_parallel: examine_parallel.o
 	$(CC2) -fopenmp examine_parallel.o -o examine_parallel
