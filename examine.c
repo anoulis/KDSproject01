@@ -94,8 +94,13 @@ Count1 είναι ο αριθμός των πραγματικών και count2 
 
 /*Αυτή είναι η main συνάρτηση όπου γίνεται και η κλήση της read_file,
 όπου πραγματοποιούνται όλα όσα απαιτούνται.*/
-int main()
+int main(int argc, char* argv[])
 {
-  read_file("data");
+if (argc<1 || argc>2)
+    {
+      printf("Error");
+      return 0;
+    }
+  read_file(argv[1]);
   return 0;
 }
