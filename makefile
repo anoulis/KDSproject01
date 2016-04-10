@@ -14,7 +14,7 @@ examine: examine.o
 
 examine_parallel: examine_parallel.o
 	$(CC2) -fopenmp examine_parallel.o -o examine_parallel
-	mpirun -np 4 ./examine_parallel 15000000 -1 data -1 -1
+	mpirun -np 4 ./examine_parallel 15000000 -1 data -1
 
 generator.o: generator.c
 	$(CC) $(CFLAGS) -c generator.c
