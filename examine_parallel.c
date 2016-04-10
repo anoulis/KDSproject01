@@ -32,9 +32,8 @@ int conflictstest(int conflicts)
 /*Η timetest είναι συνάρτηση που αφορά τον έλεγχο του δεύτερου ορίσματος δηλαδή τον χρόνο εκτέλεσης.
   Αν δωθεί 0 τερματίζει το πρόγραμμα και ενημερώνει τον χρήστη.
   Αν δωθεί -1 εκτελεί το πρόγραμμα μέχρι σύμφωνα με άλλα ορίσματα.
-  Αν δωθεί οποιοσδήπωτε άλλος αριθμός τρέχει το πρόγραμμα και το τερματίζει μετά απο το δοθλεν διάστημα.
+  Αν δωθεί οποιοσδήπωτε άλλος αριθμός τρέχει το πρόγραμμα και το τερματίζει μετά απο το δοθέν διάστημα.
 */
-/*
 int timetest(int maxtime)
 {  if(maxtime==0)
    {printf("The program will exit \nbecause the maxtime is 0 seconds.\n");
@@ -44,9 +43,11 @@ int timetest(int maxtime)
    else if(maxtime==-1)
      return maxtime;
    else
-     return 0;
+   {printf("The program will exit after sometime.\n");
+    return maxtime;
+    exit(0);
+     }
 }
-*/
 
 /*Η filetest είναι συνάρτηση που αφορά τον έλεγχο του τρίτου ορίσματος δηλαδή την ύπαρξη του αρχείου.
   Αν δεν βρεθεί τον αρχείο με το συγκεκριμένο όνομα τερματίζει το πρόγραμμα.*/
@@ -88,24 +89,22 @@ int threadstest(int threads)
   Αν δωθεί -1 εκτελεί το πρόγραμμα με τον μέγιστο αριθμό processes.
   Αν δωθεί οποιοσδήπωτε άλλος αριθμός τρέχει το πρόγραμμα είτε με αυτόν τον αριθμό processes
   είτε με τον μέγιστο δυνατό αν αυτός ο αριθμός υπερβαίνει το αριθμό διαθέσιμων processes.*/
-/*
 int procstest(int processes)
 {if(processes==-1)
-     return omp_get_max_threads();
+     return omp_get_num_procs();
   else if(processes==0 || processes<0)
          {printf("The program will exit \nbecause the number of processes is not right.\n");
           exit(0);
          }
   else
-  { if(processes<=)
+  { if(processes<=omp_get_num_procs())
       {
        return processes;
       }
       else
-      return
+      return omp_get_num_procs();
   }
 }
-*/
 
 /*Η print_time είναι συνάρτηση για την εκτύπωση του χρόνου εκτέλεσης του προγράμματος.
   Είναι υλοποιημένη σύμφωνα με τις οδηγίες των διαλέξεων.*/
@@ -134,21 +133,19 @@ int read_file(int argc, char* argv[])
        int maxtime=atoi(argv[2]);
        char* filename=argv[3];
        int threads=atoi(argv[4]);
-       int processes=atoi(argv[5]);
 
    /*Κλήση των συναρτήσεων ελέγχου του κάθε ορίσματος
    και ανέθεση τιμών.*/
   int number = conflictstest(conflicts);
   filetest(filename);
   threads=threadstest(threads);
+  maxtime=timetest(maxtime);
 
   /*Αρχικοποίση του OPENMPI,δημιουργία διάφορων μεταβλητών
   και ανάθεση τιμών σε κάποιες απ'αυτές.*/
   MPI_Init(&argc, &argv);
   MPI_File myfile;
   MPI_Status status;
-  //int m = MPI_UNIVERSE_SIZE;
-  //printf(" m = %d\n",m);
   int i,k=0,rank, size, bufsize,count1=0,count1_gloabl,count2=0,count2_gloabl;
   float percentage,x;
   MPI_Offset start2;
@@ -270,7 +267,7 @@ exit(0);
 Επίσης γίνεται και η κλήση της read_file όπου πραγματοποιούνται όλα όσα απαιτούνται.   */
 int main(int argc, char* argv[])
 {
-  if (argc<1 || argc>6)
+  if (argc<1 || argc>5)
     {
       printf("Error");
       return 0;
